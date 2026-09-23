@@ -23,3 +23,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             college=validated_data['college']
         )
         return user
+
+class CollegeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = College
+        fields = ['id', 'name', 'code', 'city', 'state', 'country']
