@@ -52,6 +52,8 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
+    is_email_verified = models.BooleanField(default=False)
+
     profile_image = models.URLField(
         blank=True,
         null=True
