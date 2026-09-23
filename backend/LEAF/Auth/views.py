@@ -7,8 +7,8 @@ from Auth.models import College
 # Create your views here.
 
 class CollegeListView(generics.ListAPIView):
-    queryset = College.object.all()
-    serializer_class = CollegeSerialize
+    queryset = College.objects.all()
+    serializer_class = CollegeSerializer
     permission_classes = [permissions.AllowAny]
 
 class RegisterView(generics.CreateAPIView):
