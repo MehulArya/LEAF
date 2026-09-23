@@ -1,13 +1,14 @@
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from Auth.serializers import RegisterSerializer, CollegeSerializer
+from Auth.serializers import RegisterSerializer, CollegeSerializer, PasswordResetRequestSerializer, PasswordResetConfirmserializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from Auth.models import College, User
 from Auth.tokens import email_verification_token
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
 # Create your views here.
 
 class CollegeListView(generics.ListAPIView):
@@ -64,3 +65,38 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_205_REST_CONTENT)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetRequestView(generics.GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+
+        try:
+            user = User.objects.get(email=email)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            reset_link = f"http://127.0.0.1:8000/auth/reset-password/{uid}/{token}/"
+            send_mail(
+                subject="Reset your Leaf password",
+                message=f"Click to reset: {reset_link}",
+                from_email="noreply@leaf.com",
+                recipient_list=[user.email],
+            )
+        except User.DoesNotExist:
+            pass
+
+        return Response({"message": "If that email exists, a reset link has been sent."})
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+    serializer_class = PasswordResetConfirmserializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "Password reset successful"})
