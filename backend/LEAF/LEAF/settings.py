@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+<<<<<<< Updated upstream
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'Auth',
@@ -56,6 +57,8 @@ INSTALLED_APPS = [
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
+=======
+>>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
